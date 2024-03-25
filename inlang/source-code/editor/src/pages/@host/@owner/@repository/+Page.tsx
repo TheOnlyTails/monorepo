@@ -7,13 +7,13 @@ import { ListHeader } from "./components/Listheader.jsx"
 import { TourHintWrapper } from "./components/Notification/TourHintWrapper.jsx"
 import { useLocalStorage } from "#src/services/local-storage/index.js"
 import type { RecentProjectType } from "#src/services/local-storage/src/schema.js"
-import { Message } from "./Message.jsx"
 import { Errors } from "./components/Errors.jsx"
 import { Layout } from "./Layout.jsx"
 import Link from "#src/renderer/Link.jsx"
 import { browserAuth } from "@lix-js/server"
 import { currentPageContext } from "#src/renderer/state.js"
 import { replaceMetaInfo } from "./helper/ReplaceMetaInfo.js"
+import { MessageWrapper } from "./components/MessageWrapper.jsx"
 
 export const [messageCount, setMessageCount] = createSignal(0)
 
@@ -172,7 +172,7 @@ function TheActualPage() {
 							>
 								<For each={project()!.query.messages.includedMessageIds()}>
 									{(id) => {
-										return <Message id={id} />
+										return <MessageWrapper id={id} />
 									}}
 								</For>
 							</TourHintWrapper>
