@@ -1,6 +1,9 @@
 {
 	"id": "library.inlang.paraglideJsAdapterSolidStart",
 	"icon": "https://cdn.jsdelivr.net/gh/opral/monorepo@latest/inlang/source-code/paraglide/paraglide-js-adapter-solidstart/assets/icon.png",
+	"gallery": [
+		"https://cdn.jsdelivr.net/gh/opral/monorepo@latest/inlang/source-code/paraglide/paraglide-js-adapter-solidstart/assets/og.png"
+	],
 	"displayName": {
 		"en": "Paraglide JS Adapter SolidStart"
 	},
@@ -11,12 +14,13 @@
 		"en": "./inlang/source-code/paraglide/paraglide-js-adapter-solidstart/README.md"
 	},
 	"keywords": [
+		"paraglide",
 		"paraglide js",
 		"libraries",
 		"website",
 		"developer",
-		"paraglide",
 		"i18n",
+		"l10n",
 		"library",
 		"localization",
 		"sdk",
@@ -26,7 +30,7 @@
 		"javascript",
 		"typescript"
 	],
-	"recommends": ["m/reootnfj", "m/632iow21", "m/r7kp499g", "m/teldgniy"],
+	"recommends": ["m/gerre34r", "m/632iow21", "m/r7kp499g", "m/teldgniy"],
 	"pricing": "free",
 	"publisherName": "inlang",
 	"publisherIcon": "https://inlang.com/favicon/safari-pinned-tab.svg",

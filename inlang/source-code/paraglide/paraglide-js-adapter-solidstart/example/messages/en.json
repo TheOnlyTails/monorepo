@@ -1,0 +1,8 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"greeting": "Hello {name}!",
+	"count": "Current Count: {count}",
+	"heading": "Get started with Paraglide",
+	"description": "It's really good",
+	"its_typesafe": "And {degree} typesafe"
+}
