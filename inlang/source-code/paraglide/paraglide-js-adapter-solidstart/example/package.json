@@ -16,7 +16,7 @@
 	},
 	"devDependencies": {
 		"@inlang/paraglide-js": "workspace:*",
-		"@inlang/paraglide-js-adapter-vite": "workspace:*"
+		"@inlang/paraglide-js-adapter-solidstart": "workspace:*"
 	},
 	"engines": {
 		"node": ">=18"

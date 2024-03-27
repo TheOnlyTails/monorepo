@@ -6,9 +6,17 @@
 	},
 	"license": "Apache-2.0",
 	"type": "module",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"exports": {
-		"types": "./dist/index.d.ts",
-		"import": "./dist/index.js"
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./vite": {
+			"types": "./dist/vite.d.ts",
+			"import": "./dist/vite.js"
+		}
 	},
 	"scripts": {
 		"build": "tsc --build",
@@ -19,6 +27,7 @@
 		"clean": "rm -rf ./dist ./node_modules"
 	},
 	"dependencies": {
+		"@inlang/paraglide-js-adapter-vite": "workspace:*",
 		"@solidjs/router": "^0.10",
 		"@solidjs/start": "^0.4",
 		"solid-js": "^1.8"
