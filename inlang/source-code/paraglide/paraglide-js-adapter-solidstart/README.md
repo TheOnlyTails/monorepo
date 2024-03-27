@@ -40,7 +40,8 @@ Create a `./messages` folder with a json file per language and add some messages
 
 ### 1. Add the Vite Plugin
 
-In `app.config.ts` add the paraglide vite plugin.
+In `app.config.ts` add the paraglide vite plugin. SolidStart uses three separate vite servers, the plugin only 
+needs to be present in one of them.
 
 ```ts
 // make sure to import from /vite
@@ -48,16 +49,23 @@ import { paraglide } from "@inlang/paraglide-js-adapter-solidstart/vite"
 import { defineConfig } from "@solidjs/start/config"
 
 export default defineConfig({
-	vite: {
-		plugins: [
-			paraglide({
-				project: "./project.inlang", //The path to project.inlang
-				outdir: "./src/paraglide", //Where to place the generated files
-			}),
-		],
-	},
+	vite({ router }) {
+		if (router === "server") {
+			return {
+				plugins: [
+					paraglide({
+						project: "./project.inlang",
+						outdir: "./src/paraglide",
+					}),
+				],
+			}
+		}
+		return {}
+	}
 })
 ```
+
+> It's not harmful to add the vite plugin to all three servers, but it causes extra logs
 
 ### 2. Use the adapter to wrap paraglide
 

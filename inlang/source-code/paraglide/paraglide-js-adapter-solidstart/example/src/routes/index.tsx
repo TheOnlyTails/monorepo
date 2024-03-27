@@ -1,14 +1,14 @@
 import { Title } from "@solidjs/meta"
+import { getRequestEvent } from "solid-js/web"
 import Counter from "~/components/Counter"
-import * as m from "~/paraglide/messages"
+import * as m from "~/paraglide/messages.js"
 
 export default function Home() {
-	const greeting = m.greeting({ name: "SAds" })
 	return (
 		<main>
 			{/* You can't use messages in <Title> components directly */}
-			<Title>{greeting}</Title>
-			<h1>{m.greeting({ name: "SolidStart" })}</h1>
+			<Title>{m.heading()}</Title>
+			<h1>{m.heading()}</h1>
 			<Counter />
 		</main>
 	)

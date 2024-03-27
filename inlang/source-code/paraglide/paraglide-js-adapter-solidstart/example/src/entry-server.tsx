@@ -1,14 +1,14 @@
 // @refresh reload
 import { createHandler, StartServer } from "@solidjs/start/server"
-import { AvailableLanguageTag } from "~/paraglide/runtime"
+import { AvailableLanguageTag, languageTag } from "~/paraglide/runtime"
 
 const dir: Record<AvailableLanguageTag, "ltr" | "rtl"> = {
 	en: "ltr",
 	de: "ltr",
 }
 
-export default createHandler((ctx) => {
-	const lang = "de"
+export default createHandler(() => {
+	const lang = languageTag()
 
 	return (
 		<StartServer

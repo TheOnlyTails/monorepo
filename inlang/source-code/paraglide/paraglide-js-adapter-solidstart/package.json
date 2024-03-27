@@ -29,8 +29,10 @@
 	"dependencies": {
 		"@inlang/paraglide-js-adapter-vite": "workspace:*",
 		"@solidjs/router": "^0.10",
-		"@solidjs/start": "^0.4",
-		"solid-js": "^1.8"
+		"solid-js": "^1.8.16"
+	},
+	"peerDependencies": {
+		"@solidjs/start": "^1.0.0 || ^1.0.0-rc.0"
 	},
 	"devDependencies": {
 		"@types/node": "^20",

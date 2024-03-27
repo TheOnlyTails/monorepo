@@ -7,5 +7,6 @@ export interface Paraglide<T extends string> {
 	readonly languageTag: () => T
 	readonly onSetLanguageTag: (callback: (language_tag: T) => void) => void
 	readonly availableLanguageTags: readonly T[]
+	readonly isAvailableLanguageTag: (thing: unknown) => thing is T
 	readonly sourceLanguageTag: T
 }
