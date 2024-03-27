@@ -1,11 +1,8 @@
 // @refresh reload
 import { createHandler, StartServer } from "@solidjs/start/server"
-import { languageTag, setLanguageTag } from "./paraglide/runtime"
+import { languageTag } from "./paraglide/runtime"
 
-export default createHandler((ctx) => {
-	console.log("ctx.request", ctx.request)
-	setLanguageTag("en")
-
+export default createHandler(() => {
 	return (
 		<StartServer
 			document={({ assets, children, scripts }) => (

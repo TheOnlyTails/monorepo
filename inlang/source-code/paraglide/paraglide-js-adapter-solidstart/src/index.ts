@@ -1,20 +1,21 @@
 import * as solid from "solid-js"
-import * as solid_web from "solid-js/web"
-import * as router from "@solidjs/router"
+import { isServer, getRequestEvent } from "solid-js/web"
+//import { useNavigate, useBeforeLeave } from "@solidjs/router"
+import type { Paraglide } from "./types"
 
 /**
  * Normalize a pathname.
  * (e.g. "/foo" → "/foo")
  * (e.g. "foo" → "/foo")
  */
-export function normalizePathname(pathname: string): string {
-	return pathname[0] === "/" ? pathname : "/" + pathname
+function normalizePathname(pathname: string): string {
+	return pathname.startsWith("/") ? pathname : "/" + pathname
 }
 
 /**
  * Get the language tag from the URL.
  *
- * @param pathname The pathname to check. (e.g. "/en/foo") (use {@link normalizePathname} first)
+ * @param pathname The pathname to check. (e.g. "/en/foo")
  * @param all_language_tags All available language tags. (From paraglide, e.g. "en", "de")
  * @returns The language tag from the URL, or `undefined` if no language tag was found.
  */
@@ -51,12 +52,12 @@ export function translateHref<T extends string>(
 	page_language_tag: T,
 	available_language_tags: readonly T[]
 ): string {
-	const to_normal_pathname = normalizePathname(pathname)
-	const to_language_tag = languageTagFromPathname(to_normal_pathname, available_language_tags)
+	const normalized_pathname = normalizePathname(pathname)
+	const target_language = languageTagFromPathname(normalized_pathname, available_language_tags)
 
-	return to_language_tag
-		? to_normal_pathname.replace(to_language_tag, page_language_tag)
-		: "/" + page_language_tag + to_normal_pathname
+	return target_language
+		? normalized_pathname.replace(target_language, page_language_tag)
+		: "/" + page_language_tag + normalized_pathname
 }
 
 /**
@@ -71,27 +72,13 @@ export function translateHref<T extends string>(
  * ```
  */
 export function useLocationPathname(): string {
-	return solid_web.isServer
+	return isServer
 		? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		  new URL(solid_web.getRequestEvent()!.request.url).pathname
+		  new URL(getRequestEvent()!.request.url).pathname
 		: window.location.pathname
 }
 
-/**
- * The compiled paraglide runtime module.
- * (e.g. "paraglide/runtime.js")
- */
-export interface Paraglide<T extends string> {
-	readonly setLanguageTag: (language_tag: T | (() => T)) => void
-	readonly languageTag: () => T
-	readonly onSetLanguageTag: (callback: (language_tag: T) => void) => void
-	readonly availableLanguageTags: readonly T[]
-	readonly sourceLanguageTag: T
-}
-
 export interface I18n<T extends string> {
-	readonly languageTag: solid.Accessor<T>
-	readonly setLanguageTag: (language_tag: T) => void
 	readonly LanguageTagProvider: solid.ContextProviderComponent<T>
 }
 
@@ -108,42 +95,42 @@ export interface I18n<T extends string> {
  * ```
  */
 export function createI18n<T extends string>(paraglide: Paraglide<T>): I18n<T> {
-	let languageTag: I18n<T>["languageTag"]
-	let setLanguageTag: I18n<T>["setLanguageTag"]
-	let LanguageTagProvider: I18n<T>["LanguageTagProvider"]
-
 	// SERVER
-	if (solid_web.isServer) {
+	if (isServer) {
 		const LanguageTagCtx = solid.createContext<T>()
-		LanguageTagProvider = LanguageTagCtx.Provider
 
-		setLanguageTag = () => {
-			throw new Error("setLanguageTag not available on server")
-		}
-		languageTag = () => {
+		const LanguageTagProvider = LanguageTagCtx.Provider
+		const languageTag = () => {
 			const ctx = solid.useContext(LanguageTagCtx)
-			if (!ctx) {
-				throw new Error("LanguageTagCtx not found")
-			}
+			if (!ctx)
+				throw new Error(
+					"LanguageTagCtx not found. Did you forget to wrap your app in <LanguageTagProvider> ?"
+				)
 			return ctx
 		}
-
 		paraglide.setLanguageTag(languageTag)
+
+		//prevent setLanguageTag from being called on server as it does nothing
+		paraglide.onSetLanguageTag(() => {
+			throw new Error("setLanguageTag not available on server")
+		})
+
+		return {
+			LanguageTagProvider,
+		}
 	}
 	// BROWSER
 	else {
 		let language_tag: T
 
-		LanguageTagProvider = (props) => {
-			language_tag = props.value
+		const LanguageTagProvider: solid.ContextProviderComponent<T> = ({ value, children }) => {
+			language_tag = value
 			paraglide.setLanguageTag(language_tag)
 
-			const navigate = router.useNavigate()
+			//const navigate = useNavigate()
 
 			/*
-			Keep the language tag in the URL
-			*/
-			router.useBeforeLeave((e) => {
+			useBeforeLeave((e) => {
 				if (typeof e.to !== "string") return
 
 				const from_pathname = normalizePathname(e.from.pathname)
@@ -174,24 +161,22 @@ export function createI18n<T extends string>(paraglide: Paraglide<T>): I18n<T> {
 				else {
 					location.pathname = to_pathname
 				}
-			})
+			})*/
 
-			return props.children
+			return children
 		}
 
-		setLanguageTag = paraglide.setLanguageTag
-		languageTag = () => language_tag
+		const languageTag = () => language_tag
+		paraglide.setLanguageTag(languageTag)
 
 		paraglide.onSetLanguageTag((new_language_tag) => {
 			if (new_language_tag === language_tag) return
 			const pathname = normalizePathname(location.pathname)
 			location.pathname = "/" + new_language_tag + pathname.replace("/" + language_tag, "")
 		})
-	}
 
-	return {
-		languageTag,
-		setLanguageTag,
-		LanguageTagProvider,
+		return {
+			LanguageTagProvider,
+		}
 	}
 }
