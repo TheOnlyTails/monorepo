@@ -2,13 +2,13 @@ import type { FetchEvent } from "@solidjs/start/dist/server/types"
 import { parse } from "cookie"
 import type { Paraglide } from "../types"
 
-export const COOKIE_NAME = "LANG"
+export const COOKIE_NAME = "PARAGLIDE_LANG"
 
 export function detectLanguageFromCookie<T extends string>(
 	runtime: Paraglide<T>,
-	request: FetchEvent["request"]
+	event: FetchEvent
 ): T | undefined {
-	const cookieHeader = request.headers.get("cookie")
+	const cookieHeader = event.request.headers.get("cookie")
 	if (!cookieHeader) return
 
 	const cookies = parse(cookieHeader)

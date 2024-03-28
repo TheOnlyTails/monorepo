@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { preferredLanguages } from "./language"
+import { preferredLanguages } from "./language-negotiation"
 
 describe("preferredLanguages", () => {
 	it("should return the acceptable languages", () => {

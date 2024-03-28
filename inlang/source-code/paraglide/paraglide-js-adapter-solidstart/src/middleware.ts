@@ -2,12 +2,13 @@ import { createMiddleware as createSolidMiddleware } from "@solidjs/start/middle
 import { getRequestEvent } from "solid-js/web"
 import type { Paraglide } from "./types"
 import type { FetchEvent } from "@solidjs/start/dist/server/types"
-import { preferredLanguages } from "./detect-language/language"
 import { detectLanguageFromCookie, setLanguageCookie } from "./detect-language/cookie"
+import { detectLanguageFromAcceptLanguage } from "./detect-language/acceptLanguage"
+import { detectLanguageFromPath } from "./detect-language/path"
 
 export function createMiddleware<T extends string>(
 	runtime: Paraglide<T>,
-	{ detectLanguage }: { detectLanguage: (request: FetchEvent["request"]) => T }
+	{ detectLanguage }: { detectLanguage?: (event: FetchEvent) => T | undefined }
 ): any {
 	type Locals = {
 		paraglide: {
@@ -26,14 +27,12 @@ export function createMiddleware<T extends string>(
 	return createSolidMiddleware({
 		onRequest: [
 			(event) => {
-				const acceptLanguageValue = event.request.headers.get("accept-language") ?? undefined
-				const languagePreferences = preferredLanguages(
-					acceptLanguageValue,
-					runtime.availableLanguageTags
-				)
-
-				const cookieLang = detectLanguageFromCookie(runtime, event.request)
-				const lang: T = languagePreferences.at(0) || detectLanguage(event.request)
+				const lang: T =
+					detectLanguage?.(event) ||
+					detectLanguageFromPath(runtime, event) ||
+					detectLanguageFromCookie(runtime, event) ||
+					detectLanguageFromAcceptLanguage(runtime, event) ||
+					runtime.sourceLanguageTag
 
 				const locals: Locals = {
 					paraglide: {
@@ -50,7 +49,7 @@ export function createMiddleware<T extends string>(
 		onBeforeResponse: [
 			(event) => {
 				//Make sure the langauge cookie matches the language
-				const detectedCookieLang = detectLanguageFromCookie(runtime, event.request)
+				const detectedCookieLang = detectLanguageFromCookie(runtime, event)
 				if (detectedCookieLang !== event.locals.paraglide.lang) {
 					setLanguageCookie(event.locals.paraglide.lang, event.response)
 				}
