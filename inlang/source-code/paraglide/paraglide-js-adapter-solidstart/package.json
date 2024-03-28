@@ -6,20 +6,20 @@
 	},
 	"license": "Apache-2.0",
 	"type": "module",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
+	"main": "dist/main/index.js",
+	"types": "dist/main/index.d.ts",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"types": "./dist/main/index.d.ts",
+			"import": "./dist/main/index.js"
 		},
 		"./vite": {
-			"types": "./dist/vite.d.ts",
-			"import": "./dist/vite.js"
+			"types": "./dist/vite/index.d.ts",
+			"import": "./dist/vite/index.js"
 		},
 		"./navigation": {
-			"types": "./dist/navigation.d.ts",
-			"import": "./dist/navigation.jsx"
+			"types": "./dist/navigation/index.d.ts",
+			"import": "./dist/navigation/index.js"
 		}
 	},
 	"scripts": {

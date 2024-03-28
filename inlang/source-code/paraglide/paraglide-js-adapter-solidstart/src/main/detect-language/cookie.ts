@@ -1,6 +1,6 @@
 import type { FetchEvent } from "@solidjs/start/dist/server/types"
 import { parse } from "cookie"
-import type { Paraglide } from "../types"
+import type { Paraglide } from "../../shared/types"
 
 export const COOKIE_NAME = "PARAGLIDE_LANG"
 

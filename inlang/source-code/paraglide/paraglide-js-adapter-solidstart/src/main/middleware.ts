@@ -1,6 +1,6 @@
 import { createMiddleware as createSolidMiddleware } from "@solidjs/start/middleware"
 import { getRequestEvent } from "solid-js/web"
-import type { Paraglide } from "./types"
+import type { Paraglide } from "../shared/types"
 import type { FetchEvent } from "@solidjs/start/dist/server/types"
 import { detectLanguageFromCookie, setLanguageCookie } from "./detect-language/cookie"
 import { detectLanguageFromAcceptLanguage } from "./detect-language/acceptLanguage"

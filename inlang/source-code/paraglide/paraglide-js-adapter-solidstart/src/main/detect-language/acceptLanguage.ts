@@ -1,6 +1,6 @@
 import type { FetchEvent } from "@solidjs/start/dist/server/types"
-import type { Paraglide } from "../types"
-import { preferredLanguages } from "../utils/language-negotiation"
+import type { Paraglide } from "../../shared/types"
+import { preferredLanguages } from "../../shared/language-negotiation"
 
 export function detectLanguageFromAcceptLanguage<T extends string>(
 	runtime: Paraglide<T>,

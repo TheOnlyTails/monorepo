@@ -1,5 +1,5 @@
 import type { FetchEvent } from "@solidjs/start/dist/server/types"
-import type { Paraglide } from "../types"
+import type { Paraglide } from "../../shared/types"
 
 export function detectLanguageFromPath<T extends string>(
 	runtime: Paraglide<T>,
