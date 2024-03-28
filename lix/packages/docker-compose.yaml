@@ -1,4 +1,5 @@
 version: '3.7'
+name: lix
 services:
   git:
     restart: always
@@ -42,8 +43,8 @@ services:
         
         # todo: shell aliase
     ports: [ "3334" ]
-    working_dir: /workspace/exp
-    entrypoint: pnpm dev
+    working_dir: /workspace
+    entrypoint: pnpm --filter=lix-app dev
     # working_dir: /workspace/exp
     # entrypoint: /bin/bash
     # stdin_open: true
