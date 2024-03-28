@@ -1,5 +1,5 @@
 import type { Paraglide } from "../shared/types"
-import { A as SolidA } from "@solidjs/router"
+import { A as SolidA, useLocation, useResolvedPath } from "@solidjs/router"
 
 type LocalizedNavigation<T extends string> = {
 	A: (
@@ -10,6 +10,9 @@ type LocalizedNavigation<T extends string> = {
 export function createNavigation<T extends string>(runtime: Paraglide<T>): LocalizedNavigation<T> {
 	return {
 		A: (props) => {
+			const currentLocation = useLocation()
+			console.log(currentLocation)
+
 			return <SolidA {...props} />
 		},
 	}

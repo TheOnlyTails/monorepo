@@ -1,4 +1,4 @@
-import { createMiddleware } from "@inlang/paraglide-js-adapter-solidstart"
+import { createMiddleware } from "../../dist/main"
 import * as runtime from "~/paraglide/runtime"
 
 export default createMiddleware(runtime)

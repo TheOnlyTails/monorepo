@@ -1,4 +1,4 @@
 import * as runtime from "~/paraglide/runtime"
-import { createNavigation } from "@inlang/paraglide-js-adapter-solidstart/navigation"
+import { createNavigation } from "../../dist/navigation"
 
-export const { A } = createNavigation<runtime.AvailableLanguageTag>()
+export const { A } = createNavigation(runtime)
