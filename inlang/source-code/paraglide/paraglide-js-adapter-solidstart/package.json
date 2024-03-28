@@ -16,6 +16,10 @@
 		"./vite": {
 			"types": "./dist/vite.d.ts",
 			"import": "./dist/vite.js"
+		},
+		"./navigation": {
+			"types": "./dist/navigation.d.ts",
+			"import": "./dist/navigation.jsx"
 		}
 	},
 	"scripts": {
@@ -34,7 +38,7 @@
 		"@solidjs/start": "^1.0.0 || ^1.0.0-rc.0",
 		"@solidjs/router": "^0.10",
 		"@solidjs/meta": "^0.29.2",
-		"solid-js": "^1.8.16"
+		"solid-js": "^1.8.0"
 	},
 	"devDependencies": {
 		"@types/cookie": "^0.6.0",
