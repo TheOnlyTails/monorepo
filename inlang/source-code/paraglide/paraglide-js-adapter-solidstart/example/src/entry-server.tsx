@@ -1,6 +1,12 @@
 // @refresh reload
 import { createHandler, StartServer } from "@solidjs/start/server"
-import { AvailableLanguageTag, languageTag } from "~/paraglide/runtime"
+import {
+	AvailableLanguageTag,
+	availableLanguageTags,
+	languageTag,
+	sourceLanguageTag,
+} from "~/paraglide/runtime"
+import { AlternateLinks } from "@inlang/paraglide-js-adapter-solidstart"
 
 const dir: Record<AvailableLanguageTag, "ltr" | "rtl"> = {
 	en: "ltr",
@@ -8,16 +14,18 @@ const dir: Record<AvailableLanguageTag, "ltr" | "rtl"> = {
 }
 
 export default createHandler(() => {
-	const lang = languageTag()
-
 	return (
 		<StartServer
 			document={({ assets, children, scripts }) => (
-				<html lang={lang} dir={dir[lang]}>
+				<html lang={languageTag()} dir={dir[languageTag()]}>
 					<head>
 						<meta charset="utf-8" />
 						<meta name="viewport" content="width=device-width, initial-scale=1" />
 						<link rel="icon" href="/favicon.ico" />
+						<AlternateLinks
+							defaultLanguage={sourceLanguageTag}
+							availableLanguages={availableLanguageTags}
+						/>
 						{assets}
 					</head>
 					<body>

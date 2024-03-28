@@ -8,7 +8,10 @@ import { detectLanguageFromPath } from "./detect-language/path"
 
 export function createMiddleware<T extends string>(
 	runtime: Paraglide<T>,
-	opts: { detectLanguage?: (event: FetchEvent) => T | undefined } = {}
+	opts: {
+		prefix?: "always"
+		detectLanguage?: (event: FetchEvent) => T | undefined
+	} = {}
 ): any {
 	type Locals = {
 		paraglide: {

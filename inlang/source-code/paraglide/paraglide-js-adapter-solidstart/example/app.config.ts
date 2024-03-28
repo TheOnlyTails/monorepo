@@ -2,6 +2,7 @@ import { defineConfig } from "@solidjs/start/config"
 import { paraglide } from "@inlang/paraglide-js-adapter-solidstart/vite"
 
 export default defineConfig({
+	middleware: "./src/middleware.ts",
 	vite({ router }) {
 		if (router === "server") {
 			return {
@@ -15,7 +16,6 @@ export default defineConfig({
 		}
 		return {}
 	},
-	middleware: "./src/middleware.ts",
 
 	ssr: true,
 	server: {

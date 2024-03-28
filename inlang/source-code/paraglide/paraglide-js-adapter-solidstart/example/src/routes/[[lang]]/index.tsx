@@ -9,7 +9,7 @@ export default function Home() {
 			<Title>{m.heading()}</Title>
 			<h1>{m.heading()}</h1>
 			<a href="/about">About</a>
-			<a href="/posts/akljshd">About</a>
+			<a href="/posts/123">Posts</a>
 			<Counter />
 		</main>
 	)

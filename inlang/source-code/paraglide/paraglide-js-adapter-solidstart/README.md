@@ -40,7 +40,7 @@ Create a `./messages` folder with a json file per language and add some messages
 
 ### 1. Add the Vite Plugin
 
-In `app.config.ts` add the paraglide vite plugin. SolidStart uses three separate vite servers, the plugin only 
+In `app.config.ts` add the paraglide vite plugin. SolidStart uses three separate vite servers, the plugin only
 needs to be present in one of them.
 
 ```ts
@@ -61,11 +61,67 @@ export default defineConfig({
 			}
 		}
 		return {}
-	}
+	},
 })
 ```
 
 > It's not harmful to add the vite plugin to all three servers, but it causes extra logs
+
+### 2. Add the middleware
+
+In `src/middleware.ts` add the paraglide middleware. This will detect the language based on the following
+criteria in descending priority.
+
+1. The Language present in the URL
+2. A Language Cookie
+3. The `Accept-Language` header
+4. The default language
+
+```ts
+import { createMiddleware } from "@inlang/paraglide-js-adapter-solidstart"
+import * as runtime from "~/paraglide/runtime.js"
+
+export default createMiddleware(runtime)
+```
+
+You need to register the middleware file in `app.config.ts`
+
+```ts
+// app.config.ts
+export default defineConfig({
+	middleware: "./src/middleware.ts",
+	...
+})
+```
+
+You can now call `languageTag()` anywhere on the server to access the current language.
+
+### 3. Set the language on the Frontend.
+
+To avoid language detection logic on the frontend we will simply pass the language detected on the server
+to the frontend. We do this via the `lang` attribute on the `html` tag.
+
+```tsx
+// src/entry-server.tsx
+import { createHandler, StartServer } from "@solidjs/start/server"
+import { languageTag } from "~/paraglide/runtime"
+
+export default createHandler(() => (
+	<StartServer
+		document={({ assets, children, scripts }) => (
+			<html lang={languageTag()}>
+				...
+```
+
+Then on the client we simply read it.
+
+```tsx
+/// src/entry-client.tsx
+import { setLanguageTag } from "~/paraglide/runtime"
+setLanguageTag(() => document.documentElement.lang)
+
+//...
+```
 
 ### 2. Use the adapter to wrap paraglide
 
@@ -126,11 +182,9 @@ export default function App() {
 			<Router
 				base={url_language_tag}
 				root={(props) => (
-					<LanguageTagProvider value={lang}>
-						<MetaProvider>
-							<Suspense>{props.children}</Suspense>
-						</MetaProvider>
-					</LanguageTagProvider>
+					<MetaProvider>
+						<Suspense>{props.children}</Suspense>
+					</MetaProvider>
 				)}
 			>
 				<FileRoutes />
@@ -186,15 +240,16 @@ If you want to navigate to a different route in a specific language, you can use
 ## Advanced Setup
 
 ### Text-Direction
+
 If you need to set the text-direction, simply define a dictionary mapping the language tag to the text direction & use it in `entry-server.tsx`.
 
 ```tsx
 // `entry-server.tsx
 import { createHandler, StartServer } from "@solidjs/start/server"
 import { useLocationLanguageTag } from "~/i18n.js"
-import { sourceLanguageTag, type AvailableLanguageTag } from "~/paraglide/runtime.js";
+import { sourceLanguageTag, type AvailableLanguageTag } from "~/paraglide/runtime.js"
 
-const dir : Record<AvailableLanguageTag, "ltr" | "rtl"> = {
+const dir: Record<AvailableLanguageTag, "ltr" | "rtl"> = {
 	en: "ltr",
 	ar: "rtl",
 }
@@ -221,7 +276,6 @@ For SEO reasons you shoul add alternate links to the same page in different lang
 const language_tag = languageTag()
 <head>
 	{availableLanguageTags
-		.filter((tag) => tag !== language_tag)
 		.map((tag) => (
 			<link
 				rel="alternate"
@@ -233,19 +287,7 @@ const language_tag = languageTag()
 </head>
 ```
 
-With these links it's not necessary to add the translations to your sitemap. 
-
-## Known Caveats
-
-A few caveats to be aware of:
-
-### Where Messages can be used 
-
-On the server, the `languageTag()` function and messages can only be used where Context can be accessed.
-
-You can't use messages in metadata tags such as `<Title>` and `<Meta>`. Instead you need to call them in the Component body & pass the resulting string into the Metadata tag. 
-
-On the client messages can be used anywhere where the DOM can be accessed.
+It's not necessary to add the translated links to your sitemap. One language being in there is sufficient.
 
 ## Example project
 

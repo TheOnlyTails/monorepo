@@ -1,15 +1,16 @@
 {
 	"extends": "../../tsconfig.base.json",
-	"include": ["src/**/*.ts"],
+	"include": ["src/**/*.ts", "src/**/*.tsx"],
 	"compilerOptions": {
 		"module": "ESNext",
 		"moduleResolution": "Node",
 		"target": "ESNext",
 		"lib": ["ESNext", "DOM"],
 		"types": [],
+		"esModuleInterop": true,
+		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
 		"noUncheckedIndexedAccess": false,
-		"jsx": "preserve",
 		"outDir": "dist",
 		"rootDir": "src"
 	}
