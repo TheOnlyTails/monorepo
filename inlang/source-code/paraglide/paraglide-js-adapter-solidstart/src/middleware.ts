@@ -2,6 +2,7 @@ import { createMiddleware as createSolidMiddleware } from "@solidjs/start/middle
 import { getRequestEvent } from "solid-js/web"
 import type { Paraglide } from "./types"
 import type { FetchEvent } from "@solidjs/start/dist/server/types"
+import { preferredLanguages } from "./detect-language/language"
 
 export function createMiddleware<T extends string>(
 	runtime: Paraglide<T>,
@@ -24,7 +25,13 @@ export function createMiddleware<T extends string>(
 	return createSolidMiddleware({
 		onRequest: [
 			(event) => {
-				const lang = detectLanguage(event.request)
+				const acceptLanguageValue = event.request.headers.get("accept-language") ?? undefined
+				const languagePreferences = preferredLanguages(
+					acceptLanguageValue,
+					runtime.availableLanguageTags
+				)
+
+				const lang: T = languagePreferences.at(0) || detectLanguage(event.request)
 
 				const locals: Locals = {
 					paraglide: {

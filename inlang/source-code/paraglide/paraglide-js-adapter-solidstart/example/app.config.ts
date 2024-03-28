@@ -16,4 +16,10 @@ export default defineConfig({
 		return {}
 	},
 	middleware: "./src/middleware.ts",
+
+	ssr: true,
+	server: {
+		baseURL: "/",
+		preset: "static",
+	},
 })

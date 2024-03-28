@@ -3,8 +3,7 @@ import * as runtime from "~/paraglide/runtime"
 
 export default createMiddleware(runtime, {
 	detectLanguage(request) {
-		const cookies = request.headers
-		console.log(request.headers)
-		return "en"
+		const [, lang] = new URL(request.url).pathname.split("/")
+		return runtime.isAvailableLanguageTag(lang) ? lang : runtime.sourceLanguageTag
 	},
 })
