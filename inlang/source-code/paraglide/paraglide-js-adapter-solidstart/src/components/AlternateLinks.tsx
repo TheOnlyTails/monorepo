@@ -1,3 +1,4 @@
+import { Link } from "@solidjs/meta"
 export function AlternateLinks<T extends string>(props: {
 	availableLanguages: readonly T[]
 	defaultLanguage: T
@@ -5,7 +6,7 @@ export function AlternateLinks<T extends string>(props: {
 	return (
 		<>
 			{props.availableLanguages.map((tag) => (
-				<link rel="alternate" href="/de" hreflang={tag} />
+				<Link rel="alternate" href="/de" hreflang={tag} />
 			))}
 		</>
 	)
