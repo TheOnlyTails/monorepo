@@ -29,15 +29,17 @@
 	"dependencies": {
 		"@inlang/paraglide-js-adapter-vite": "workspace:*",
 		"@solidjs/router": "^0.10",
+		"cookie": "^0.6.0",
 		"solid-js": "^1.8.16"
 	},
 	"peerDependencies": {
 		"@solidjs/start": "^1.0.0 || ^1.0.0-rc.0"
 	},
 	"devDependencies": {
+		"@types/cookie": "^0.6.0",
 		"@types/node": "^20",
 		"@vitest/coverage-v8": "0.34.3",
-		"vitest": "0.34.3",
-		"typescript": "^5"
+		"typescript": "^5",
+		"vitest": "0.34.3"
 	}
 }
