@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   git:
+    restart: always
     container_name: git
     image: git:10
     hostname: git
@@ -17,14 +18,13 @@ services:
       - lix
     # depends_on:
     #   - exp
-    # restart: always
     # image downgrades user but that seems not to work, see: https://caddy.community/t/basic-docker-compose-setup-failing/6892/7?u=alexander_gabriel
     user: root
     # env_file:
     #   - ./.env
 
   exp:
-    # restart: always
+    restart: always
     container_name: exp
     hostname: exp
     labels: [ dev.orbstack.domains=exp.local ]
@@ -36,8 +36,9 @@ services:
         RUN apt-get install openssl curl libssl-dev -y
         RUN corepack enable pnpm
         COPY --chown=app:app . /workspace
-        RUN cd /workspace && pnpm --filter=@lix-js/client --filter=@lix-js/fs install
-        RUN cd /workspace/exp && pnpm install
+        WORKDIR /workspace
+        RUN pnpm --filter=@lix-js/client --filter=@lix-js/fs --filter=lix-app install
+        RUN pnpm --filter=@lix-js/client --filter=@lix-js/fs --filter=lix-app build
         
         # todo: shell aliase
     ports: [ "3334" ]
@@ -61,7 +62,7 @@ services:
       - pnpm-store:/root/.local/share/pnpm/store/v3
 
   # josh:
-  #   # restart: always
+  #   restart: always
   #   container_name: josh
   #   hostname: josh
   #   labels: [ dev.orbstack.domains=josh.local ]
