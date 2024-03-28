@@ -4,9 +4,11 @@
 	"compilerOptions": {
 		"module": "ESNext",
 		"moduleResolution": "Node",
+		"target": "ESNext",
 		"lib": ["ESNext", "DOM"],
 		"types": [],
 		"jsxImportSource": "solid-js",
+		"noUncheckedIndexedAccess": false,
 		"jsx": "preserve",
 		"outDir": "dist",
 		"rootDir": "src"
