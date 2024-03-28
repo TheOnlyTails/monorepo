@@ -158,39 +158,16 @@ export default Page() {
 }
 ```
 
-### 6. Switch language
-
-You can switch languages by calling the `setLanguageTag` function provided by the adapter. This will navigate to the translated variant of the current route.
-
-```tsx
-<select onChange={(e) => setLanguageTag(e.target.value)}>
-	{availableLanguageTags.map((tag) => (
-		<option value={tag} selected={tag === languageTag()}>
-			{tag}
-		</option>
-	))}
-</select>
-```
-
-If you want to navigate to a different route in a specific language, you can use the `translateHref` function provided by the adapter to generate the correct href.
-
-```tsx
-<A href={translateHref("/about", "en")}>{m.about()}</A>
-```
-
-> ⚠️ Don't use the `translateHref` function on links that point to external websites. It will break the link.
-
 ## Advanced Setup
 
 ### Text-Direction
 
-If you need to set the text-direction, simply define a dictionary mapping the language tag to the text direction & use it in `entry-server.tsx`.
+To set the text-direction: Define a dictionary mapping the language tag to the text direction & use it in `entry-server.tsx`.
 
 ```tsx
 // `entry-server.tsx
 import { createHandler, StartServer } from "@solidjs/start/server"
-import { useLocationLanguageTag } from "~/i18n.js"
-import { sourceLanguageTag, type AvailableLanguageTag } from "~/paraglide/runtime.js"
+import { languageTag, type AvailableLanguageTag } from "~/paraglide/runtime.js"
 
 const dir: Record<AvailableLanguageTag, "ltr" | "rtl"> = {
 	en: "ltr",
@@ -198,22 +175,16 @@ const dir: Record<AvailableLanguageTag, "ltr" | "rtl"> = {
 }
 
 export default createHandler(() => {
-	const language_tag = useLocationLanguageTag() ?? sourceLanguageTag
 	return (
 		<StartServer
 			document={(props) => (
-				<html lang={language_tag} dir={dir[language_tag]}>
+				<html lang={languageTag()} dir={dir[languageTag()]}>
 					{/* ... */}
-				</html>
-			)}
-		/>
-	)
-})
 ```
 
 ### Alternate links
 
-For SEO reasons you shoul add alternate links to the same page in different languages. These should include a link to the current language as well.
+Add alternate links that link to the current page in different languages, including the current language. You only want these on the pages that are translated, so the best place to add them is in `[[lang]].tsx`. If added there they will 
 
 ```tsx
 const language_tag = languageTag()
