@@ -1,11 +1,12 @@
 import { Title } from "@solidjs/meta";
+import { A } from "~/i18n"
 
 export default function Home() {
   return (
 		<main>
 			<Title>About</Title>
 			<h1>About</h1>
-			<a href="/">Home</a>
+			<A href="/">Home</A>
 		</main>
 	)
 }
