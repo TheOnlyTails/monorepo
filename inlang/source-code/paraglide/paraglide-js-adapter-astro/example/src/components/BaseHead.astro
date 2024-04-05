@@ -2,30 +2,25 @@
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
 import '../styles/global.css';
-import { availableLanguageTags, isAvailableLanguageTag, sourceLanguageTag } from '../paraglide/runtime.js';
+import { availableLanguageTags, isAvailableLanguageTag } from '../paraglide/runtime.js';
+import { getAbsoluteLocaleUrl, getAbsoluteLocaleUrlList } from 'astro:i18n';
 
 interface Props {
 	title: string;
 	description: string;
 	image?: string;
 }
-
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-
 const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
 
-function translatePath(path: string, lang: string) {
-	const withoutPrefix = removeLanguagePrefix(path) || '/';
-	if(lang === sourceLanguageTag) {
-		return withoutPrefix;
-	}
-	return `/${lang}${withoutPrefix}`;
-}
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 function removeLanguagePrefix(path: string) {
 	const [maybeLanguage, ...rest] = path.split('/').filter(Boolean);
 	return isAvailableLanguageTag(maybeLanguage) ? rest.join('/') : path;
 }
+
+const currentPathWithoutLanguage = removeLanguagePrefix(Astro.url.pathname);
 ---
 
 <!-- Global Metadata -->
@@ -37,9 +32,6 @@ function removeLanguagePrefix(path: string) {
 <!-- Font preloads -->
 <link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
 <link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin />
-
-<!-- Canonical URL -->
-<link rel="canonical" href={canonicalURL} />
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>
@@ -61,6 +53,6 @@ function removeLanguagePrefix(path: string) {
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
 
 <!-- Alternate Language Versions -->
-{availableLanguageTags.map(lang => (
-	<link rel="alternate" hreflang={lang} href={translatePath(Astro.url.pathname, lang)} />
+{availableLanguageTags.map((lang) => (
+	<link rel="alternate" hreflang={lang} href={getAbsoluteLocaleUrl(lang,currentPathWithoutLanguage)} />
 ))}
