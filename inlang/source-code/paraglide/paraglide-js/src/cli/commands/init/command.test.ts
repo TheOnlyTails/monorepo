@@ -17,7 +17,7 @@ import { describe } from "node:test"
 import nodeFsPromises from "node:fs/promises"
 import childProcess from "node:child_process"
 import memfs from "memfs"
-import type { ProjectSettings } from "@inlang/sdk"
+import { loadProject, type ProjectSettings } from "@inlang/sdk"
 import { version } from "../../state.js"
 import { createNodeishMemoryFs } from "@inlang/sdk/test-utilities"
 import { Logger } from "../../../services/logger/index.js"
@@ -90,7 +90,7 @@ describe("initializeInlangProject()", () => {
 
 			process.cwd = () => "/folder/subfolder"
 			mockUserInput(["useExistingProject"])
-			const path = await initializeInlangProject({ logger, repo })
+			const { projectPath: path } = await initializeInlangProject({ logger, repo })
 			expect(path).toBe("../project.inlang")
 		},
 		{
@@ -102,8 +102,9 @@ describe("initializeInlangProject()", () => {
 		const fs = mockFiles({})
 		const repo = await openRepository("file://", { nodeishFs: fs })
 		mockUserInput(["newProject", "en"])
-		const path = await initializeInlangProject({ logger, repo })
+		const { project, projectPath: path } = await initializeInlangProject({ logger, repo })
 		expect(path).toBe("./project.inlang")
+		expect(project.settings().languageTags).toEqual(["en"])
 		expect(await pathExists("./project.inlang", fs)).toBe(true)
 	})
 })
@@ -131,18 +132,20 @@ describe("addCompileStepToPackageJSON()", () => {
 			"/package.json": "{}",
 		})
 		const repo = await openRepository("file://", { nodeishFs: fs })
-		await addCompileStepToPackageJSON(
-			{
-				projectPath: "./project.inlang",
-			},
-			{ logger, repo }
-		)
+		await addCompileStepToPackageJSON({
+			projectPath: "./project.inlang",
+			outdir: "./src/paraglide",
+			logger,
+			repo,
+		})
 		expect(fs.writeFile).toHaveBeenCalledOnce()
 		expect(logger.success).toHaveBeenCalledOnce()
 		const packageJson = JSON.parse(
 			(await fs.readFile("/package.json", { encoding: "utf-8" })) as string
 		)
-		expect(packageJson.scripts.build).toBe(`paraglide-js compile --project ./project.inlang`)
+		expect(packageJson.scripts.build).toBe(
+			`paraglide-js compile --project ./project.inlang --outdir ./src/paraglide`
+		)
 	})
 
 	test("if an existing build step exists, it should be preceeded by the paraglide-js compile command", async () => {
@@ -154,19 +157,19 @@ describe("addCompileStepToPackageJSON()", () => {
 			}),
 		})
 		const repo = await openRepository("file://", { nodeishFs: fs })
-		await addCompileStepToPackageJSON(
-			{
-				projectPath: "./project.inlang",
-			},
-			{ logger, repo }
-		)
+		await addCompileStepToPackageJSON({
+			projectPath: "./project.inlang",
+			outdir: "./src/paraglide",
+			logger,
+			repo,
+		})
 		expect(fs.writeFile).toHaveBeenCalledOnce()
 		expect(logger.success).toHaveBeenCalledOnce()
 		const packageJson = JSON.parse(
 			(await fs.readFile("/package.json", { encoding: "utf-8" })) as string
 		)
 		expect(packageJson.scripts.build).toBe(
-			`paraglide-js compile --project ./project.inlang && some build step`
+			`paraglide-js compile --project ./project.inlang --outdir ./src/paraglide && some build step`
 		)
 	})
 
@@ -184,12 +187,12 @@ describe("addCompileStepToPackageJSON()", () => {
 			// user does not want to update the build step
 			false,
 		])
-		await addCompileStepToPackageJSON(
-			{
-				projectPath: "./project.inlang",
-			},
-			{ logger, repo }
-		)
+		await addCompileStepToPackageJSON({
+			projectPath: "./project.inlang",
+			outdir: "./src/paraglide",
+			logger,
+			repo,
+		})
 		expect(fs.writeFile).not.toHaveBeenCalled()
 		expect(logger.success).not.toHaveBeenCalled()
 		expect(logger.warn).toHaveBeenCalledOnce()
@@ -210,12 +213,12 @@ describe("addCompileStepToPackageJSON()", () => {
 			// user does not want to update the build step
 			true,
 		])
-		await addCompileStepToPackageJSON(
-			{
-				projectPath: "./project.inlang",
-			},
-			{ logger, repo }
-		)
+		await addCompileStepToPackageJSON({
+			projectPath: "./project.inlang",
+			outdir: "./src/paraglide",
+			logger,
+			repo,
+		})
 		expect(fs.writeFile).not.toHaveBeenCalled()
 		expect(logger.success).not.toHaveBeenCalled()
 		expect(logger.warn).toHaveBeenCalledOnce()
@@ -236,12 +239,12 @@ describe("addCompileStepToPackageJSON()", () => {
 			// user does not want to update the build step
 			false,
 		])
-		await addCompileStepToPackageJSON(
-			{
-				projectPath: "./project.inlang",
-			},
-			{ logger, repo }
-		)
+		await addCompileStepToPackageJSON({
+			projectPath: "./project.inlang",
+			outdir: "./src/paraglide",
+			logger,
+			repo,
+		})
 		expect(fs.writeFile).toHaveBeenCalled()
 		expect(logger.success).toHaveBeenCalled()
 
@@ -249,7 +252,7 @@ describe("addCompileStepToPackageJSON()", () => {
 			(await fs.readFile("/package.json", { encoding: "utf-8" })) as string
 		)
 		expect(packageJson.scripts.postinstall).toBe(
-			`paraglide-js compile --project ./project.inlang && do-something`
+			`paraglide-js compile --project ./project.inlang --outdir ./src/paraglide && do-something`
 		)
 	})
 
@@ -267,12 +270,12 @@ describe("addCompileStepToPackageJSON()", () => {
 			// user does not want to update the build step
 			false,
 		])
-		await addCompileStepToPackageJSON(
-			{
-				projectPath: "./project.inlang",
-			},
-			{ logger, repo }
-		)
+		await addCompileStepToPackageJSON({
+			projectPath: "./project.inlang",
+			outdir: "./src/paraglide",
+			logger,
+			repo,
+		})
 		const packageJson = JSON.parse(
 			(await fs.readFile("/package.json", { encoding: "utf-8" })) as string
 		)
@@ -289,30 +292,35 @@ describe("addCompileStepToPackageJSON()", () => {
 			// user does not want to update the build step
 			false,
 		])
-		await addCompileStepToPackageJSON(
-			{
-				projectPath: "./project.inlang",
-			},
-			{ logger, repo }
-		)
+		await addCompileStepToPackageJSON({
+			projectPath: "./project.inlang",
+			outdir: "./src/paraglide",
+			logger,
+			repo,
+		})
 		const packageJson = JSON.parse(
 			(await fs.readFile("/package.json", { encoding: "utf-8" })) as string
 		)
-		expect(packageJson.scripts.postinstall).toBe(`paraglide-js compile --project ./project.inlang`)
+		expect(packageJson.scripts.postinstall).toBe(
+			`paraglide-js compile --project ./project.inlang --outdir ./src/paraglide`
+		)
 	})
 })
 
 describe("existingProjectFlow()", () => {
-	test("if the user selects to proceed with the existing project and the project has no errors, the function should return", async () => {
+	test("if the user selects to proceed with the existing project and the project has no errors, the function should return the project", async () => {
 		const fs = mockFiles({
 			"/project.inlang/settings.json": JSON.stringify(getNewProjectTemplate()),
 		})
 		const repo = await openRepository("file://", { nodeishFs: fs })
 
 		mockUserInput(["useExistingProject"])
-		expect(
-			existingProjectFlow({ existingProjectPath: "/project.inlang" }, { logger, repo })
-		).resolves.toBeUndefined()
+		const project = await existingProjectFlow(
+			{ existingProjectPath: "/project.inlang" },
+			{ logger, repo }
+		)
+
+		expect(project.settings().languageTags).toEqual(getNewProjectTemplate().languageTags)
 	})
 
 	test("if the user selects a new project, the newProjectFlow() should be executed", async () => {
@@ -352,12 +360,15 @@ describe("maybeAddVsCodeExtension()", () => {
 		process.cwd = () => "/folder"
 
 		const repo = await openRepository("file://folder/", { nodeishFs: fs })
-
+		const project = await loadProject({
+			projectPath: "/folder/project.inlang",
+			repo,
+		})
 		mockUserInput([
 			// user uses vscode
 			true,
 		])
-		await maybeAddVsCodeExtension({ projectPath: "/folder/project.inlang" }, { logger, repo })
+		await maybeAddVsCodeExtension({ project, logger, repo })
 		expect(consola.prompt).toHaveBeenCalledOnce()
 		const extensions = await fs.readFile("/folder/.vscode/extensions.json", {
 			encoding: "utf-8",
@@ -377,12 +388,16 @@ describe("maybeAddVsCodeExtension()", () => {
 			"/project.inlang/settings.json": JSON.stringify(getNewProjectTemplate()),
 		})
 		const repo = await openRepository("file://", { nodeishFs: fs })
+		const project = await loadProject({
+			projectPath: "/project.inlang",
+			repo,
+		})
 
 		mockUserInput([
 			// user does not use vscode
 			false,
 		])
-		await maybeAddVsCodeExtension({ projectPath: "/project.inlang" }, { logger, repo })
+		await maybeAddVsCodeExtension({ project, logger, repo })
 		expect(consola.prompt).toHaveBeenCalledOnce()
 		expect(fs.writeFile).not.toHaveBeenCalled()
 	})
@@ -395,12 +410,16 @@ describe("maybeAddVsCodeExtension()", () => {
 			"/project.inlang/settings.json": JSON.stringify(withEmptyModules),
 		})
 		const repo = await openRepository("file://", { nodeishFs: fs })
+		const project = await loadProject({
+			projectPath: "/project.inlang",
+			repo,
+		})
 
 		mockUserInput([
 			// user uses vscode
 			true,
 		])
-		await maybeAddVsCodeExtension({ projectPath: "/project.inlang" }, { logger, repo })
+		await maybeAddVsCodeExtension({ project, logger, repo })
 		const projectSettings = JSON.parse(
 			await fs.readFile("/project.inlang/settings.json", {
 				encoding: "utf-8",
@@ -413,12 +432,16 @@ describe("maybeAddVsCodeExtension()", () => {
 			"/project.inlang/settings.json": JSON.stringify(getNewProjectTemplate()),
 		})
 		const repo = await openRepository("file://", { nodeishFs: fs })
+		const project = await loadProject({
+			projectPath: "/project.inlang",
+			repo,
+		})
 
 		mockUserInput([
 			// user uses vscode
 			true,
 		])
-		await maybeAddVsCodeExtension({ projectPath: "/project.inlang" }, { logger, repo })
+		await maybeAddVsCodeExtension({ project, logger, repo })
 		expect(await pathExists("/.vscode/extensions.json", fs)).toBe(true)
 	})
 
@@ -428,8 +451,12 @@ describe("maybeAddVsCodeExtension()", () => {
 			"/project.inlang/settings.json": JSON.stringify(getNewProjectTemplate()),
 		})
 		const repo = await openRepository("file://", { nodeishFs: fs })
+		const project = await loadProject({
+			projectPath: "/project.inlang",
+			repo,
+		})
 
-		await maybeAddVsCodeExtension({ projectPath: "/project.inlang" }, { logger, repo })
+		await maybeAddVsCodeExtension({ project, logger, repo })
 		expect(consola.prompt).not.toHaveBeenCalled()
 		const extensions = await fs.readFile("/.vscode/extensions.json", {
 			encoding: "utf-8",
@@ -530,7 +557,7 @@ describe("checkIfUncommittedChanges()", () => {
 			cb(new Error("Command failed: git status"), Buffer.from(""), Buffer.from(""))
 		})
 
-		expect(checkIfUncommittedChanges({ logger, repo })).resolves.toBeUndefined()
+		expect(checkIfUncommittedChanges({ logger, repo })).resolves.toBeDefined()
 	})
 
 	test("it should continue if no uncomitted changes exist", async () => {
@@ -542,7 +569,7 @@ describe("checkIfUncommittedChanges()", () => {
 			cb(undefined, Buffer.from(""), Buffer.from(""))
 		})
 
-		expect(checkIfUncommittedChanges({ logger, repo })).resolves.toBeUndefined()
+		expect(checkIfUncommittedChanges({ logger, repo })).resolves.toBeDefined()
 	})
 
 	test("it should prompt the user if there are uncommitted changes and exit if the user doesn't want to continue", async () => {
@@ -626,7 +653,7 @@ describe("findExistingInlangProjectPath()", () => {
 		const fs = mockFiles({})
 		const repo = await openRepository("file://", { nodeishFs: fs })
 
-		const path = await findExistingInlangProjectPath({ logger, repo })
+		const path = await findExistingInlangProjectPath(repo)
 		expect(path).toBeUndefined()
 	})
 
@@ -635,7 +662,7 @@ describe("findExistingInlangProjectPath()", () => {
 		const fs = mockFiles({ "project.inlang/settings.json": "{}" })
 		const repo = await openRepository("file://", { nodeishFs: fs })
 
-		const path = await findExistingInlangProjectPath({ logger, repo })
+		const path = await findExistingInlangProjectPath(repo)
 		expect(path).toBe("./project.inlang")
 	})
 
@@ -648,7 +675,7 @@ describe("findExistingInlangProjectPath()", () => {
 		})
 		const repo = await openRepository("file://", { nodeishFs: fs })
 
-		const path = await findExistingInlangProjectPath({ logger, repo })
+		const path = await findExistingInlangProjectPath(repo)
 		expect(path).toBe("../project.inlang")
 	})
 
@@ -660,7 +687,7 @@ describe("findExistingInlangProjectPath()", () => {
 		})
 		const repo = await openRepository("file://", { nodeishFs: fs })
 
-		const path = await findExistingInlangProjectPath({ repo, logger })
+		const path = await findExistingInlangProjectPath(repo)
 		expect(path).toBe("../../project.inlang")
 	})
 })
@@ -670,9 +697,7 @@ describe("maybeChangeTsConfigModuleResolution()", () => {
 		const fs = mockFiles({})
 		const repo = await openRepository("file://", { nodeishFs: fs })
 
-		const result = await maybeChangeTsConfigModuleResolution({ logger, repo })
-		// no tsconfig exists, immediately return
-		expect(result).toBeUndefined()
+		await maybeChangeTsConfigModuleResolution({ logger, repo })
 		// no info that the moduleResolution needs to be adapted should be logged
 		expect(logger.info).not.toHaveBeenCalled()
 	})
@@ -783,9 +808,7 @@ describe("maybeChangeTsConfigAllowJs()", () => {
 		const fs = mockFiles({})
 		const repo = await openRepository("file://", { nodeishFs: fs })
 
-		const result = await maybeChangeTsConfigAllowJs({ logger, repo })
-		// no tsconfig exists, immediately return
-		expect(result).toBeUndefined()
+		await maybeChangeTsConfigAllowJs({ logger, repo })
 		// no info that the moduleResolution needs to be adapted should be logged
 		expect(logger.info).not.toHaveBeenCalled()
 	})

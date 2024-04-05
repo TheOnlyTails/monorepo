@@ -31,15 +31,21 @@ const Footer = () => {
 		return [
 			{
 				name: "About Fink",
-				href: import.meta.env.PROD ? "https://inlang.com/m/tdozzpar" : "http://localhost:3000/m/tdozzpar",
+				href: import.meta.env.PROD
+					? "https://inlang.com/m/tdozzpar"
+					: "http://localhost:3000/m/tdozzpar",
 			},
 			{
 				name: "User Guide",
-				href: import.meta.env.PROD ? "https://inlang.com/g/6ddyhpoi" : "http://localhost:3000/g/6ddyhpoi",
+				href: import.meta.env.PROD
+					? "https://inlang.com/g/6ddyhpoi"
+					: "http://localhost:3000/g/6ddyhpoi",
 			},
 			{
 				name: "About the ecosystem",
-				href: import.meta.env.PROD ? "https://inlang.com/documentation" : "http://localhost:3000/documentation",
+				href: import.meta.env.PROD
+					? "https://inlang.com/documentation"
+					: "http://localhost:3000/documentation",
 			},
 			{
 				name: "Support Forum",
@@ -64,19 +70,17 @@ const Footer = () => {
 			{
 				name: "Join the Team",
 				href: "https://github.com/opral/monorepo/tree/main/careers",
-			}
+			},
 		]
 	}
 
 	return (
-		<footer class="overflow-hidden max-w-7xl mx-auto bg-background border-t border-surface-200 py-4 px-4 overflow-visible">
-			<div class="flex justify-between gap-4">
-				<div class="xl:w-1/4 xl:px-4 flex items-center justify-between">
-					<p class="text-sm text-surface-500">
-						© {new Date().getFullYear().toString()} Opral
-					</p>
+		<footer class="bg-background border-t border-surface-200 py-4 px-4 overflow-visible">
+			<div class="max-w-7xl mx-auto flex justify-between gap-4 xl:px-4 h-6">
+				<div class="flex items-center justify-between">
+					<p class="text-sm text-surface-500">© {new Date().getFullYear().toString()} Opral</p>
 				</div>
-				<div class="flex gap-4">
+				<div class="flex gap-4 mr-[67.21px]">
 					<For each={socialMediaLinks}>
 						{(link) => (
 							<Link
@@ -91,30 +95,22 @@ const Footer = () => {
 					</For>
 				</div>
 				<div class="relative">
-					<sl-dropdown
-						prop:placement="top-end"
-						prop:distance={4}
-						class="peer"
-					>
-						<button slot="trigger" class="bg-surface-800 rounded-full p-1">
-							<IconQuestionMark class="w-4 h-4" color="background" />
+					<sl-dropdown prop:placement="top-end" prop:distance={4} class="peer">
+						<button slot="trigger" class="bg-surface-900 rounded-full p-1">
+							<IconQuestionMark class="w-4 h-4 text-background" />
 						</button>
-						{/* <button slot="trigger" class="flex items-center link link-primary">
-							Help
-							<IconExpandMore />
-						</button> */}
 						<sl-menu class="w-fit">
 							<For each={getResourcesLinks()}>
 								{(link) => (
 									<>
 										<sl-menu-item>
-											<a
-												href={link.href} target="_blank"
-											>
+											<a href={link.href} target="_blank">
 												{link.name}
 											</a>
 										</sl-menu-item>
-										<Show when={link.name === "About the ecosystem" || link.name === "Submit Feedback"}>
+										<Show
+											when={link.name === "About the ecosystem" || link.name === "Submit Feedback"}
+										>
 											<div class="w-full border-b border-surface-200 my-1" />
 										</Show>
 									</>
