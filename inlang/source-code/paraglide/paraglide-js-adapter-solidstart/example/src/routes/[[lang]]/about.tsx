@@ -6,7 +6,9 @@ export default function Home() {
 		<main>
 			<Title>About</Title>
 			<h1>About</h1>
-			<A href="/">Home</A>
+			<A href="/" hreflang="de">
+				Home
+			</A>
 		</main>
 	)
 }
